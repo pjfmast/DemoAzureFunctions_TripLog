@@ -9,6 +9,7 @@ namespace TripLog.ViewModels
     public class NewEntryViewModel : BaseValidationViewModel
     {
         readonly ILocationService _locService;
+        readonly ITripLogDataService _tripLogDataService;
 
      
         string _title;
@@ -85,10 +86,14 @@ namespace TripLog.ViewModels
         public Command SaveCommand =>
             _saveCommand ?? (_saveCommand = new Command(async () => await Save(), CanSave));
 
-        public NewEntryViewModel(INavService navService, ILocationService locService)
+        public NewEntryViewModel(
+            INavService navService, 
+            ILocationService locService,
+            ITripLogDataService tripLogDataService)
            : base(navService)
         {
             _locService = locService;
+            _tripLogDataService = tripLogDataService;
 
             Date = DateTime.Today;
             Rating = 1;
@@ -130,8 +135,8 @@ namespace TripLog.ViewModels
                 // TODO: Persist entry in a later chapter
 
                 // TODO: Remove this in Chapter 6
-                await Task.Delay(1000);
-
+                //await Task.Delay(1000);
+                await _tripLogDataService.AddEntryAsync(newItem);
                 await NavService.GoBack();
             }
             finally
