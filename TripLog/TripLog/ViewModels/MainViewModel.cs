@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace TripLog.ViewModels {
     public class MainViewModel : BaseViewModel {
+
+        readonly ITripLogDataService _tripLogDataService;
+
         ObservableCollection<TripLogEntry> _logEntries;
         public ObservableCollection<TripLogEntry> LogEntries {
             get => _logEntries;
@@ -23,8 +26,10 @@ namespace TripLog.ViewModels {
         Command _refreshCommand;
         public Command RefreshCommand => _refreshCommand ?? (_refreshCommand = new Command(LoadEntries));
 
-        public MainViewModel(INavService navService)
+        // todo for Azure api, add an ITripLogDataService as parameter to the MainViewModel
+        public MainViewModel(INavService navService, ITripLogDataService tripLogDataService)
             : base(navService) {
+            _tripLogDataService = tripLogDataService;
             LogEntries = new ObservableCollection<TripLogEntry>();
         }
 
@@ -32,7 +37,19 @@ namespace TripLog.ViewModels {
             LoadEntries();
         }
 
-        void LoadEntries() {
+        async void LoadEntries() {
+            if (IsBusy)
+                return;
+            IsBusy = true;
+            try {
+                var entries = await _tripLogDataService.GetEntriesAsync();
+                LogEntries = new ObservableCollection<TripLogEntry>(entries);
+            }
+            finally {
+                IsBusy = false;
+            }
+        }
+        void LoadEntriesOld() {
             if (IsBusy) {
                 return;
             }
