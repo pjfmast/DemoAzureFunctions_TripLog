@@ -144,6 +144,9 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="akavache.mobile">
+      <Version>7.2.1</Version>
+    </PackageReference>
     <PackageReference Include="Newtonsoft.Json">
       <Version>13.0.1</Version>
     </PackageReference>

@@ -4,11 +4,17 @@ using Xamarin.Forms;
 using TripLog.Models;
 using TripLog.Services;
 using System.Threading.Tasks;
+using Akavache;
+using Xamarin.Essentials;
 
 namespace TripLog.ViewModels {
     public class MainViewModel : BaseViewModel {
 
         readonly ITripLogDataService _tripLogService;
+
+        //     IBlobCache is the core interface on which Akavache is built, it is an interface
+        //     describing an asynchronous persistent key-value store.
+        readonly IBlobCache _cache;
 
         ObservableCollection<TripLogEntry> _logEntries;
         public ObservableCollection<TripLogEntry> LogEntries {
@@ -24,12 +30,17 @@ namespace TripLog.ViewModels {
         public Command NewCommand => new Command(async () => await NavService.NavigateTo<NewEntryViewModel>());
 
         Command _refreshCommand;
-        public Command RefreshCommand => _refreshCommand ?? (_refreshCommand = new Command(LoadEntries));
+        public Command RefreshCommand => _refreshCommand ?? (_refreshCommand = new Command(() => LoadEntries(true)));
 
         // todo for Azure api, add an ITripLogDataService as parameter to the MainViewModel
-        public MainViewModel(INavService navService, ITripLogDataService tripLogService)
+        public MainViewModel(INavService navService,
+            ITripLogDataService tripLogService,
+            IBlobCache cache
+            )
             : base(navService) {
             _tripLogService = tripLogService;
+            _cache = cache;
+
             LogEntries = new ObservableCollection<TripLogEntry>();
         }
 
@@ -37,15 +48,36 @@ namespace TripLog.ViewModels {
             LoadEntries();
         }
 
-        async void LoadEntries() {
-            if (IsBusy)
+        void LoadEntries(bool force=false) {
+            if (IsBusy) {
                 return;
-            IsBusy = true;
-            try {
-                var entries = await _tripLogService.GetEntriesAsync();
-                LogEntries = new ObservableCollection<TripLogEntry>(entries);
             }
-            finally {
+
+            IsBusy = true;
+
+            try {
+                // Load from local cache and then immediately load from API
+                _cache.GetAndFetchLatest(
+                    "entries",
+                    async () => await _tripLogService.GetEntriesAsync(),
+                     offset => {
+                         // When no network is available return false to just retrieve data from the cache
+                         if (Connectivity.NetworkAccess == NetworkAccess.None) {
+                             return false;
+                         }
+
+                         TimeSpan elapsed = DateTimeOffset.Now - offset;
+                         bool invalidateCache = (force || elapsed > new TimeSpan(24, 0, 0));
+                         return invalidateCache;
+                     }
+                    )
+                    .Subscribe(entries => {
+                        // possible Exception (If service does not exist then entries = null):
+                        //   T:System.ArgumentNullException: The collection parameter cannot be null.
+                        LogEntries = new ObservableCollection<TripLogEntry>(entries);
+                        IsBusy = false;
+                    });
+            } finally {
                 IsBusy = false;
             }
         }
