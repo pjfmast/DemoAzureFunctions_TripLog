@@ -9,7 +9,7 @@ namespace TripLog.ViewModels
     public class NewEntryViewModel : BaseValidationViewModel
     {
         readonly ILocationService _locService;
-        readonly ITripLogDataService _tripLogDataService;
+        readonly ITripLogDataService _tripLogService;
 
      
         string _title;
@@ -89,11 +89,11 @@ namespace TripLog.ViewModels
         public NewEntryViewModel(
             INavService navService, 
             ILocationService locService,
-            ITripLogDataService tripLogDataService)
+            ITripLogDataService tripLogService)
            : base(navService)
         {
             _locService = locService;
-            _tripLogDataService = tripLogDataService;
+            _tripLogService = tripLogService;
 
             Date = DateTime.Today;
             Rating = 1;
@@ -136,7 +136,7 @@ namespace TripLog.ViewModels
 
                 // TODO: Remove this in Chapter 6
                 //await Task.Delay(1000);
-                await _tripLogDataService.AddEntryAsync(newItem);
+                await _tripLogService.AddEntryAsync(newItem);
                 await NavService.GoBack();
             }
             finally

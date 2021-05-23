@@ -15,7 +15,7 @@ namespace TripLog.Modules
             Bind<NewEntryViewModel>().ToSelf();
 
             // Core Services aded for Azure api
-            var tripLogService = new TripLogApiDataService(new Uri("https://triplogxamarin.azurewebsites.net/api/TripLogEntry"));
+            var tripLogService = new TripLogApiDataService(new Uri("https://triplogxamarin.azurewebsites.net"));
             Bind<ITripLogDataService>()
                 .ToMethod(x => tripLogService)
                 .InSingletonScope();

@@ -21,8 +21,8 @@ namespace TripLog.Services
 
         public async Task<IList<TripLogEntry>> GetEntriesAsync()
         {
-            // here 'entry' is the name of the called Azure function
-            var url = new Uri(_baseUri, "/api/entry");
+            // here 'triplogentry' is the name of the called Azure function
+            var url = new Uri(_baseUri, "/api/triplogentry");
             var response = await SendRequestAsync<TripLogEntry[]>(url, HttpMethod.Get, _headers);
 
             return response;
