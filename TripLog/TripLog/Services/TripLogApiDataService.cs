@@ -30,7 +30,7 @@ namespace TripLog.Services
 
         public async Task<TripLogEntry> AddEntryAsync(TripLogEntry entry)
         {
-            var url = new Uri(_baseUri, "/api/entry");
+            var url = new Uri(_baseUri, "/api/triplogentry");
             var response = await SendRequestAsync<TripLogEntry>(url, HttpMethod.Post, _headers, entry);
 
             return response;

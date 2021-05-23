@@ -68,7 +68,6 @@
     <Compile Include="Renderers\DatePickerEntryCellRenderer.cs" />
     <None Include="Entitlements.plist" />
     <None Include="Info.plist" />
-    <Compile Include="Modules\TripLogPlatformModule.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

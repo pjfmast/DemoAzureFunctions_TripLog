@@ -20,6 +20,10 @@ namespace TripLog.Modules
             Bind<INavService>()
                .ToMethod(x => navService)
                .InSingletonScope();
+
+            Bind<ILocationService>()
+                .To<LocationService>()
+                .InSingletonScope();
         }
     }
 }
