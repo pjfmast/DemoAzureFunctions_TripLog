@@ -32,9 +32,10 @@ namespace TripLog.ViewModels {
         Command _refreshCommand;
         public Command RefreshCommand => _refreshCommand ?? (_refreshCommand = new Command(() => LoadEntries(true)));
 
-        // todo for Azure api, add an ITripLogDataService as parameter to the MainViewModel
+        // todo 3a. for Azure data service, add an ITripLogDataService as parameter to the MainViewModel
         public MainViewModel(INavService navService,
             ITripLogDataService tripLogService,
+            // todo 5a. use Akavache library for offline data caching
             IBlobCache cache
             )
             : base(navService) {
@@ -59,9 +60,10 @@ namespace TripLog.ViewModels {
                 // Load from local cache and then immediately load from API
                 _cache.GetAndFetchLatest(
                     "entries",
+                    // todo 3b. use TripLogApiDataService to get all entries
                     async () => await _tripLogService.GetEntriesAsync(),
                      offset => {
-                         // When no network is available return false to just retrieve data from the cache
+                         // todo 5b. When no network is available return false to just retrieve data from the cache
                          if (Connectivity.NetworkAccess == NetworkAccess.None) {
                              return false;
                          }
@@ -71,9 +73,10 @@ namespace TripLog.ViewModels {
                          return invalidateCache;
                      }
                     )
+                    // In the Subscribe extension method,
+                    // we will update the LogEntries ObservableCollection property on the MainViewModel
+                    // based on what is either returned from the cache or from the subsequent API call, if successful:.
                     .Subscribe(entries => {
-                        // possible Exception (If service does not exist then entries = null):
-                        //   T:System.ArgumentNullException: The collection parameter cannot be null.
                         LogEntries = new ObservableCollection<TripLogEntry>(entries);
                         IsBusy = false;
                     });

@@ -132,10 +132,11 @@ namespace TripLog.ViewModels
                     Notes = Notes
                 };
 
-                // TODO: Persist entry in a later chapter
 
                 // TODO: Remove this in Chapter 6
                 //await Task.Delay(1000);
+
+                // todo 4. Persist new entry using TripLogApiDataService
                 await _tripLogService.AddEntryAsync(newItem);
                 await NavService.GoBack();
             }

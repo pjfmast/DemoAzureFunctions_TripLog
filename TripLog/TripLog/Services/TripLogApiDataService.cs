@@ -6,6 +6,8 @@ using TripLog.Models;
 
 namespace TripLog.Services
 {
+    // todo 2. implement an api data service using BaseHttpService
+
     public class TripLogApiDataService : BaseHttpService, ITripLogDataService
     {
         readonly Uri _baseUri;
@@ -21,6 +23,7 @@ namespace TripLog.Services
 
         public async Task<IList<TripLogEntry>> GetEntriesAsync()
         {
+            // todo 2a. use Azure function to get all TripLog entries
             // here 'triplogentry' is the name of the called Azure function
             var url = new Uri(_baseUri, "/api/triplogentry");
             var response = await SendRequestAsync<TripLogEntry[]>(url, HttpMethod.Get, _headers);
@@ -30,6 +33,7 @@ namespace TripLog.Services
 
         public async Task<TripLogEntry> AddEntryAsync(TripLogEntry entry)
         {
+            // todo 2b. use Azure function to add new TripLog entry
             var url = new Uri(_baseUri, "/api/triplogentry");
             var response = await SendRequestAsync<TripLogEntry>(url, HttpMethod.Post, _headers, entry);
 
